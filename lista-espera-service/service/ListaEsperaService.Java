@@ -1,8 +1,11 @@
 package cl.duoc.rednorte.listaespera.service;
 
+import cl.duoc.rednorte.listaespera.dto.ListaEsperaDTO;
 import cl.duoc.rednorte.listaespera.model.ListaEspera;
 import cl.duoc.rednorte.listaespera.model.ListaEspera.EstadoSolicitud;
+import cl.duoc.rednorte.listaespera.model.Paciente;
 import cl.duoc.rednorte.listaespera.repository.ListaEsperaRepository;
+import cl.duoc.rednorte.listaespera.repository.PacienteRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,51 +20,55 @@ import java.util.List;
 public class ListaEsperaService {
 
     private final ListaEsperaRepository repo;
+    private final PacienteRepository pacienteRepository; // ← inyección agregada
 
-    // ── Circuit Breaker activo en este método ────────────────
-    //    Si falla 5+ veces → abre el circuito y llama al
-    //    fallbackPendientes() en lugar de seguir reintentando
     @CircuitBreaker(name = "listaEsperaService", fallbackMethod = "fallbackPendientes")
     public List<ListaEspera> obtenerPendientes() {
         log.info("Consultando solicitudes pendientes...");
         return repo.findPendientesOrdenados();
     }
 
-    // Fallback: se ejecuta cuando el Circuit Breaker está ABIERTO
     public List<ListaEspera> fallbackPendientes(Exception ex) {
         log.warn("[Circuit Breaker ABIERTO] Error: {}", ex.getMessage());
         return Collections.emptyList();
     }
 
-    // ── Obtener por ID ───────────────────────────────────────
     public ListaEspera obtenerPorId(Long id) {
         return repo.findById(id)
             .orElseThrow(() -> new RuntimeException("Solicitud no encontrada con id: " + id));
     }
 
-    // ── Filtrar por estado ───────────────────────────────────
     public List<ListaEspera> obtenerPorEstado(EstadoSolicitud estado) {
         log.info("Buscando solicitudes con estado: {}", estado);
         return repo.findByEstado(estado);
     }
 
-    // ── Filtrar por paciente ─────────────────────────────────
     public List<ListaEspera> obtenerPorPaciente(Long pacienteId) {
         log.info("Buscando solicitudes del paciente ID: {}", pacienteId);
         return repo.findByPacienteId(pacienteId);
     }
 
-    // ── Registrar nueva solicitud ────────────────────────────
-    public ListaEspera registrar(ListaEspera solicitud) {
-        solicitud.setEstado(EstadoSolicitud.PENDIENTE);          // forzar estado inicial
-        solicitud.setFechaSolicitud(LocalDateTime.now());        // fecha del sistema
+    // ← ahora recibe DTO en lugar de la entidad directamente
+    public ListaEspera registrar(ListaEsperaDTO dto) {
+        Paciente paciente = pacienteRepository.findById(dto.getPacienteId())
+            .orElseThrow(() -> new RuntimeException(
+                "Paciente no encontrado: " + dto.getPacienteId()));
+
+        ListaEspera solicitud = ListaEspera.builder()
+            .paciente(paciente)
+            .especialidad(dto.getEspecialidad())
+            .hospital(dto.getHospital())
+            .prioridad(dto.getPrioridad())
+            .estado(EstadoSolicitud.PENDIENTE)
+            .fechaSolicitud(LocalDateTime.now())
+            .observaciones(dto.getObservaciones())
+            .build();
+
         ListaEspera guardada = repo.save(solicitud);
         log.info("Nueva solicitud registrada ID: {}", guardada.getId());
         return guardada;
     }
 
-    // ── Asignar hora médica ──────────────────────────────────
-    //    PENDIENTE → ASIGNADO + guarda fecha de atención
     public ListaEspera asignar(Long id) {
         ListaEspera s = obtenerPorId(id);
         if (s.getEstado() != EstadoSolicitud.PENDIENTE) {
@@ -74,8 +81,6 @@ public class ListaEsperaService {
         return repo.save(s);
     }
 
-    // ── Marcar como atendida ─────────────────────────────────
-    //    ASIGNADO → ATENDIDO
     public ListaEspera atender(Long id) {
         ListaEspera s = obtenerPorId(id);
         if (s.getEstado() != EstadoSolicitud.ASIGNADO) {
@@ -87,9 +92,6 @@ public class ListaEsperaService {
         return repo.save(s);
     }
 
-    // ── Cancelar solicitud ───────────────────────────────────
-    //    Cualquier estado → CANCELADO
-    //    Libera la hora médica para reasignación
     public ListaEspera cancelar(Long id) {
         ListaEspera s = obtenerPorId(id);
         if (s.getEstado() == EstadoSolicitud.ATENDIDO) {
@@ -100,9 +102,8 @@ public class ListaEsperaService {
         return repo.save(s);
     }
 
-    // ── Eliminar físicamente ─────────────────────────────────
     public void eliminar(Long id) {
-        obtenerPorId(id);                  // verifica que existe
+        obtenerPorId(id);
         repo.deleteById(id);
         log.info("Solicitud {} eliminada", id);
     }

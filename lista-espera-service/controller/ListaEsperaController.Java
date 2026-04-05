@@ -69,10 +69,9 @@ public class ListaEsperaController {
     //               "observaciones": "Paciente hipertenso" }
     // ─────────────────────────────────────────────────
     @PostMapping
-    public ResponseEntity<ListaEspera> registrar(
-            @RequestBody ListaEspera solicitud) {
-        ListaEspera nueva = listaEsperaService.registrar(solicitud);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nueva);
+    public ResponseEntity<ListaEspera> registrar(@Valid @RequestBody ListaEsperaDTO dto) {
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(listaEsperaService.registrar(dto));
     }
 
     // ─────────────────────────────────────────────────
