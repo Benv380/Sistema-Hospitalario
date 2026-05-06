@@ -1,5 +1,10 @@
 package cl.duoc.rednorte.listaespera.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import cl.duoc.rednorte.listaespera.dto.CitaMedicaDTO;
 import cl.duoc.rednorte.listaespera.model.CitaMedica;
 import cl.duoc.rednorte.listaespera.model.CitaMedica.EstadoCita;
@@ -9,9 +14,6 @@ import cl.duoc.rednorte.listaespera.repository.CitaMedicaRepository;
 import cl.duoc.rednorte.listaespera.repository.ListaEsperaRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

@@ -1,10 +1,11 @@
 package cl.duoc.rednorte.listaespera.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+import jakarta.validation.Valid;
 import cl.duoc.rednorte.listaespera.dto.CitaMedicaDTO;
 import cl.duoc.rednorte.listaespera.model.CitaMedica;
 import cl.duoc.rednorte.listaespera.model.CitaMedica.EstadoCita;
 import cl.duoc.rednorte.listaespera.service.CitaMedicaService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ public class CitaMedicaController {
 
     // POST /api/v1/citas → agendar nueva cita
     @PostMapping
+    @PreAuthorize("hasAnyRole('PACIENTE','FUNCIONARIO')")
     public ResponseEntity<CitaMedica> agendar(@Valid @RequestBody CitaMedicaDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(citaMedicaService.agendar(dto));
@@ -50,24 +52,28 @@ public class CitaMedicaController {
     // GET /api/v1/citas/reasignacion
     // Citas canceladas disponibles para reasignar a pacientes en espera
     @GetMapping("/reasignacion")
+    @PreAuthorize("hasAnyRole('FUNCIONARIO','ADMIN_HOSPITAL')")
     public ResponseEntity<List<CitaMedica>> obtenerDisponiblesReasignacion() {
         return ResponseEntity.ok(citaMedicaService.obtenerDisponiblesParaReasignacion());
     }
 
     // PUT /api/v1/citas/{id}/confirmar
     @PutMapping("/{id}/confirmar")
+    @PreAuthorize("hasAnyRole('FUNCIONARIO','MEDICO')")
     public ResponseEntity<CitaMedica> confirmar(@PathVariable Long id) {
         return ResponseEntity.ok(citaMedicaService.confirmar(id));
     }
 
     // PUT /api/v1/citas/{id}/realizar
     @PutMapping("/{id}/realizar")
+    @PreAuthorize("hasRole('MEDICO')")
     public ResponseEntity<CitaMedica> marcarRealizada(@PathVariable Long id) {
         return ResponseEntity.ok(citaMedicaService.marcarRealizada(id));
     }
 
     // PUT /api/v1/citas/{id}/cancelar?motivo=...
     @PutMapping("/{id}/cancelar")
+    @PreAuthorize("hasAnyRole('FUNCIONARIO','ADMIN_HOSPITAL','PACIENTE')")
     public ResponseEntity<CitaMedica> cancelar(
             @PathVariable Long id,
             @RequestParam(defaultValue = "Sin motivo especificado") String motivo) {

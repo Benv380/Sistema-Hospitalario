@@ -1,5 +1,8 @@
 package cl.duoc.rednorte.listaespera.controller;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+import jakarta.validation.Valid;
+import cl.duoc.rednorte.listaespera.dto.ListaEsperaDTO;
 import cl.duoc.rednorte.listaespera.model.ListaEspera;
 import cl.duoc.rednorte.listaespera.model.ListaEspera.EstadoSolicitud;
 import cl.duoc.rednorte.listaespera.service.ListaEsperaService;
@@ -22,6 +25,7 @@ public class ListaEsperaController {
     //  ordenadas por prioridad y fecha (usa Circuit Breaker)
     // ─────────────────────────────────────────────────
     @GetMapping("/pendientes")
+    @PreAuthorize("hasAnyRole('FUNCIONARIO','MEDICO','ADMIN_HOSPITAL')")
     public ResponseEntity<List<ListaEspera>> obtenerPendientes() {
         return ResponseEntity.ok(listaEsperaService.obtenerPendientes());
     }
@@ -69,6 +73,7 @@ public class ListaEsperaController {
     //               "observaciones": "Paciente hipertenso" }
     // ─────────────────────────────────────────────────
     @PostMapping
+    @PreAuthorize("hasAnyRole('PACIENTE','FUNCIONARIO')")
     public ResponseEntity<ListaEspera> registrar(@Valid @RequestBody ListaEsperaDTO dto) {
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(listaEsperaService.registrar(dto));
@@ -90,6 +95,7 @@ public class ListaEsperaController {
     //  Cambia estado PENDIENTE → ASIGNADO
     // ─────────────────────────────────────────────────
     @PutMapping("/{id}/asignar")
+    @PreAuthorize("hasAnyRole('FUNCIONARIO','ADMIN_HOSPITAL')")
     public ResponseEntity<ListaEspera> asignar(@PathVariable Long id) {
         return ResponseEntity.ok(listaEsperaService.asignar(id));
     }
@@ -111,6 +117,7 @@ public class ListaEsperaController {
     //  preferir el cambio de estado)
     // ─────────────────────────────────────────────────
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN_HOSPITAL','ADMIN_SOFTWARE')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         listaEsperaService.eliminar(id);
         return ResponseEntity.noContent().build(); // HTTP 204

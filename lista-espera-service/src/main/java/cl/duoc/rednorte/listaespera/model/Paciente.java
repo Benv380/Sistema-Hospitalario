@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
 
+@Getter
+@Setter
 @Entity                     // Esta clase = tabla en base de datos
 @Table(name = "pacientes") // Nombre exacto de la tabla en PostgreSQL
 @Data                       // Lombok: genera getters, setters, toString, equals, hashCode

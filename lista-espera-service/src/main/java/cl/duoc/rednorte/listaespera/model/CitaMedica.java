@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "citas_medicas")
 @Data @NoArgsConstructor @AllArgsConstructor @Builder
