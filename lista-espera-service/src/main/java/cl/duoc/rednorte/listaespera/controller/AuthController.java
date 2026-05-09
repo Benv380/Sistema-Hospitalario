@@ -1,15 +1,20 @@
 package cl.duoc.rednorte.listaespera.controller;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import cl.duoc.rednorte.listaespera.dto.AuthResponse;
 import cl.duoc.rednorte.listaespera.dto.LoginRequest;
 import cl.duoc.rednorte.listaespera.dto.RegisterRequest;
 import cl.duoc.rednorte.listaespera.service.AuthService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/auth") // Base: /api/auth
+@RequestMapping("/api/v1/auth") // Base: /api/auth
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:5173")
 public class AuthController {

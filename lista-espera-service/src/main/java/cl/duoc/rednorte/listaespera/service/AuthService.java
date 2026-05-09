@@ -1,15 +1,17 @@
 package cl.duoc.rednorte.listaespera.service;
 
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import cl.duoc.rednorte.listaespera.config.JwtService;
-import cl.duoc.rednorte.listaespera.dto.*;
+import cl.duoc.rednorte.listaespera.dto.AuthResponse;
+import cl.duoc.rednorte.listaespera.dto.RegisterRequest;
 import cl.duoc.rednorte.listaespera.model.RolUsuario;
 import cl.duoc.rednorte.listaespera.model.Usuario;
 import cl.duoc.rednorte.listaespera.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +34,8 @@ public class AuthService {
         String token = jwtService.generateToken(usuario, rol);
         String redirectUrl = resolverRedirect(rol);
 
-        return new AuthResponse(token, rol, usuario.getNombreCompleto(), redirectUrl);
+        // 👇 Se agrega usuario.getId()
+        return new AuthResponse(usuario.getId(), token, rol, usuario.getNombreCompleto(), redirectUrl);
     }
 
     public AuthResponse registrar(RegisterRequest req) {
@@ -50,9 +53,10 @@ public class AuthService {
             .activo(true)
             .build();
 
-        usuarioRepo.save(nuevo);
-        String token = jwtService.generateToken(nuevo, rol.name());
-        return new AuthResponse(token, rol.name(), nuevo.getNombreCompleto(), resolverRedirect(rol.name()));
+        // Guardar en variable para obtener el id generado
+        Usuario guardado = usuarioRepo.save(nuevo);
+        String token = jwtService.generateToken(guardado, rol.name());
+        return new AuthResponse(guardado.getId(), token, rol.name(), guardado.getNombreCompleto(), resolverRedirect(rol.name()));
     }
 
     private String resolverRedirect(String rol) {

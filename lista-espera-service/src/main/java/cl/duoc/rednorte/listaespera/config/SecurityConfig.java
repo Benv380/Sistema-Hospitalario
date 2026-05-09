@@ -33,35 +33,25 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-            // 1. Deshabilitar CSRF (necesario para APIs REST con JWT)
             .csrf(AbstractHttpConfigurer::disable)
-            
-            // 2. Configurar CORS usando el bean definido abajo
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            
-            // 3. Stateless: No manejamos sesiones en el servidor
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            
-            // 4. Autorización de rutas
             .authorizeHttpRequests(auth -> auth
-                // Permitir todas las opciones (Preflight)
+
+                // Preflight CORS
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                
-                // Permitir Login y Registro sin Token
+
+                // Auth sin token — ambos prefijos por compatibilidad
                 .requestMatchers("/api/auth/**").permitAll()
-                
-                // Cualquier otra ruta de la API requiere estar logueado
-                .requestMatchers("/api/v1/**").authenticated()
-                
-                // Bloqueo total por defecto para cualquier otra cosa
+                .requestMatchers("/api/v1/auth/**").permitAll()
+
+                // Todo lo demás requiere autenticación
                 .anyRequest().authenticated()
             )
-            
-            // 5. Inyectar el filtro de JWT antes del filtro de usuario/password estándar
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-            
             .build();
     }
+    
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
