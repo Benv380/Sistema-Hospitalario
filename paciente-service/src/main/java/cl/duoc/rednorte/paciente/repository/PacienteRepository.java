@@ -10,4 +10,5 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
     Optional<Paciente> findByRut(String rut);
     Boolean existsByRut(String rut);
     Optional<Paciente> findByEmail(String email);
+    Optional<Paciente> findByUsuarioId(Long usuarioId);
 }

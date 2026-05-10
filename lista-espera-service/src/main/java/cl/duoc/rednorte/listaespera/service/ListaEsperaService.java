@@ -3,9 +3,7 @@ package cl.duoc.rednorte.listaespera.service;
 import cl.duoc.rednorte.listaespera.dto.ListaEsperaDTO;
 import cl.duoc.rednorte.listaespera.model.ListaEspera;
 import cl.duoc.rednorte.listaespera.model.ListaEspera.EstadoSolicitud;
-import cl.duoc.rednorte.listaespera.model.Paciente;
 import cl.duoc.rednorte.listaespera.repository.ListaEsperaRepository;
-import cl.duoc.rednorte.listaespera.repository.PacienteRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +18,6 @@ import java.util.List;
 public class ListaEsperaService {
 
     private final ListaEsperaRepository repo;
-    private final PacienteRepository pacienteRepository; // ← inyección agregada
 
     @CircuitBreaker(name = "listaEsperaService", fallbackMethod = "fallbackPendientes")
     public List<ListaEspera> obtenerPendientes() {
@@ -48,14 +45,9 @@ public class ListaEsperaService {
         return repo.findByPacienteId(pacienteId);
     }
 
-    // ← ahora recibe DTO en lugar de la entidad directamente
     public ListaEspera registrar(ListaEsperaDTO dto) {
-        Paciente paciente = pacienteRepository.findById(dto.getPacienteId())
-            .orElseThrow(() -> new RuntimeException(
-                "Paciente no encontrado: " + dto.getPacienteId()));
-
         ListaEspera solicitud = ListaEspera.builder()
-            .paciente(paciente)
+            .pacienteId(dto.getPacienteId())
             .especialidad(dto.getEspecialidad())
             .hospital(dto.getHospital())
             .prioridad(dto.getPrioridad())
@@ -65,7 +57,7 @@ public class ListaEsperaService {
             .build();
 
         ListaEspera guardada = repo.save(solicitud);
-        log.info("Nueva solicitud registrada ID: {}", guardada.getId());
+        log.info("Nueva solicitud registrada ID: {} para paciente ID: {}", guardada.getId(), dto.getPacienteId());
         return guardada;
     }
 

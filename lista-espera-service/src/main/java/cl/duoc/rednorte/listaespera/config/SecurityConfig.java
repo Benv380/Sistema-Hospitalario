@@ -58,7 +58,7 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         
         // El origen de tu Frontend (Vite)
-        config.setAllowedOrigins(List.of("http://localhost:5173"));
+        config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174"));
         
         // Métodos permitidos
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));

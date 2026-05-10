@@ -13,7 +13,10 @@ public class Paciente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 12, unique = true)
+    @Column(unique = true)
+    private Long usuarioId;
+
+    @Column(length = 12, unique = true)
     private String rut;
 
     @Column(nullable = false, length = 100)
@@ -22,7 +25,6 @@ public class Paciente {
     @Column(nullable = false, length = 100)
     private String apellido;
 
-    @Column(nullable = false)
     private LocalDate fechaNacimiento;
 
     @Column(length = 150)

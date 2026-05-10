@@ -22,8 +22,6 @@ public class CitaMedicaService {
 
     private final CitaMedicaRepository citaRepo;
     private final ListaEsperaRepository listaEsperaRepo;
-    // Inyectamos NotificacionFactory para avisar al paciente
-    private final NotificacionFactory notificacionFactory;
 
     // ── Agendar nueva cita ───────────────────────────────────────────
     // Vincula una CitaMedica a una solicitud de ListaEspera existente
@@ -66,16 +64,7 @@ public class CitaMedicaService {
         solicitud.setFechaAtencion(dto.getFechaHoraCita());
         listaEsperaRepo.save(solicitud);
 
-        // 6. Notificar al paciente por email
-        String emailPaciente = solicitud.getPaciente().getEmail();
-        if (emailPaciente != null) {
-            notificacionFactory.crear("EMAIL").enviar(
-                emailPaciente,
-                "Su cita médica fue agendada para: " + dto.getFechaHoraCita()
-                + " con Dr/a. " + dto.getNombreMedico()
-                + " en " + dto.getHospital()
-            );
-        }
+        log.info("Notificación pendiente para paciente ID: {}", solicitud.getPacienteId());
 
         log.info("Cita agendada ID: {} para solicitud: {}", guardada.getId(), solicitud.getId());
         return guardada;
@@ -134,15 +123,7 @@ public class CitaMedicaService {
         solicitud.setFechaAtencion(null);
         listaEsperaRepo.save(solicitud);
 
-        // Notificar al paciente
-        String email = solicitud.getPaciente().getEmail();
-        if (email != null) {
-            notificacionFactory.crear("EMAIL").enviar(
-                email,
-                "Su cita médica fue cancelada. Motivo: " + motivo
-                + ". Será contactado para reagendar."
-            );
-        }
+        log.info("Notificación cancelación pendiente para paciente ID: {}", solicitud.getPacienteId());
 
         log.info("Cita {} cancelada. Motivo: {}", id, motivo);
         return citaRepo.save(cita);
@@ -175,6 +156,10 @@ public class CitaMedicaService {
 
     public List<CitaMedica> obtenerPorEstado(EstadoCita estado) {
         return citaRepo.findByEstado(estado);
+    }
+
+    public List<CitaMedica> obtenerPorPaciente(Long pacienteId) {
+        return citaRepo.findByPacienteId(pacienteId);
     }
 
     public List<CitaMedica> obtenerDisponiblesParaReasignacion() {

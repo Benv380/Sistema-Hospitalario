@@ -24,6 +24,11 @@ public class PacienteService {
             .orElseThrow(() -> new RuntimeException("Paciente no encontrado: " + id));
     }
 
+    public Paciente obtenerPorUsuarioId(Long usuarioId) {
+        return pacienteRepository.findByUsuarioId(usuarioId)
+            .orElseThrow(() -> new RuntimeException("Paciente no encontrado para usuario: " + usuarioId));
+    }
+
     public Paciente obtenerPorRut(String rut) {
         return pacienteRepository.findByRut(rut)
             .orElseThrow(() -> new RuntimeException("Paciente no encontrado con RUT: " + rut));
@@ -54,6 +59,8 @@ public class PacienteService {
         existente.setEmail(dto.getEmail());
         existente.setTelefono(dto.getTelefono());
         existente.setDireccion(dto.getDireccion());
+        if (dto.getRut() != null && !dto.getRut().isBlank()) existente.setRut(dto.getRut());
+        if (dto.getFechaNacimiento() != null) existente.setFechaNacimiento(dto.getFechaNacimiento());
         return pacienteRepository.save(existente);
     }
 

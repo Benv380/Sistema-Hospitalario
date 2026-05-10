@@ -32,4 +32,14 @@ public interface CitaMedicaRepository extends JpaRepository<CitaMedica, Long> {
 
     // Verificar si ya existe una cita para una solicitud
     boolean existsByListaEsperaId(Long listaEsperaId);
+
+    // Citas de un paciente (a través de lista_espera)
+    @Query("SELECT c FROM CitaMedica c WHERE c.listaEspera.pacienteId = :pacienteId")
+    List<CitaMedica> findByPacienteId(Long pacienteId);
+
+    // Próxima cita de un paciente (PROGRAMADA o CONFIRMADA, futura)
+    @Query("SELECT c FROM CitaMedica c WHERE c.listaEspera.pacienteId = :pacienteId " +
+           "AND c.estado IN ('PROGRAMADA','CONFIRMADA') AND c.fechaHoraCita >= :ahora " +
+           "ORDER BY c.fechaHoraCita ASC")
+    List<CitaMedica> findProximaCitaPaciente(Long pacienteId, LocalDateTime ahora);
 }

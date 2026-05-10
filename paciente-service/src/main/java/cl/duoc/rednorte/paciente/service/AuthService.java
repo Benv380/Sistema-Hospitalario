@@ -3,8 +3,10 @@ package cl.duoc.rednorte.paciente.service;
 import cl.duoc.rednorte.paciente.config.JwtService;
 import cl.duoc.rednorte.paciente.dto.AuthResponse;
 import cl.duoc.rednorte.paciente.dto.RegisterRequest;
+import cl.duoc.rednorte.paciente.model.Paciente;
 import cl.duoc.rednorte.paciente.model.RolUsuario;
 import cl.duoc.rednorte.paciente.model.Usuario;
+import cl.duoc.rednorte.paciente.repository.PacienteRepository;
 import cl.duoc.rednorte.paciente.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final UsuarioRepository usuarioRepo;
+    private final PacienteRepository pacienteRepo;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
@@ -49,6 +52,19 @@ public class AuthService {
             .build();
 
         Usuario guardado = usuarioRepo.save(nuevo);
+
+        if (rol == RolUsuario.PACIENTE) {
+            String[] partes = req.getNombreCompleto().trim().split("\\s+", 2);
+            String nombre   = partes[0];
+            String apellido = partes.length > 1 ? partes[1] : "—";
+            pacienteRepo.save(Paciente.builder()
+                .usuarioId(guardado.getId())
+                .nombre(nombre)
+                .apellido(apellido)
+                .email(guardado.getEmail())
+                .build());
+        }
+
         String token = jwtService.generateToken(guardado, rol.name());
         log.info("Usuario registrado: {}", guardado.getEmail());
         return new AuthResponse(guardado.getId(), token, rol.name(), guardado.getNombreCompleto(), resolverRedirect(rol.name()));

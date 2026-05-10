@@ -29,6 +29,12 @@ public class PacienteController {
         return ResponseEntity.ok(pacienteService.obtenerPorId(id));
     }
 
+    @GetMapping("/usuario/{usuarioId}")
+    @PreAuthorize("hasAnyRole('FUNCIONARIO','MEDICO','ADMIN_HOSPITAL','PACIENTE')")
+    public ResponseEntity<Paciente> obtenerPorUsuarioId(@PathVariable Long usuarioId) {
+        return ResponseEntity.ok(pacienteService.obtenerPorUsuarioId(usuarioId));
+    }
+
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN_HOSPITAL','ADMIN_SOFTWARE','FUNCIONARIO')")
     public ResponseEntity<Paciente> crear(@Valid @RequestBody PacienteDTO dto) {

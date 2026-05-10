@@ -14,16 +14,16 @@ public class PacienteInternalController {
 
     private final PacienteRepository pacienteRepository;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> obtenerDatosPaciente(@PathVariable Long id) {
-        Paciente p = pacienteRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Paciente no encontrado: " + id));
+    @GetMapping("/{usuarioId}")
+    public ResponseEntity<Map<String, Object>> obtenerDatosPaciente(@PathVariable Long usuarioId) {
+        Paciente p = pacienteRepository.findByUsuarioId(usuarioId)
+            .orElseThrow(() -> new RuntimeException("Paciente no encontrado para usuario: " + usuarioId));
 
         return ResponseEntity.ok(Map.of(
-            "id", p.getId(),
-            "nombre", p.getNombre(),
-            "apellido", p.getApellido(),
-            "rut", p.getRut(),
+            "id", p.getUsuarioId(),
+            "nombre", p.getNombre() != null ? p.getNombre() : "",
+            "apellido", p.getApellido() != null ? p.getApellido() : "",
+            "rut", p.getRut() != null ? p.getRut() : "",
             "email", p.getEmail() != null ? p.getEmail() : ""
         ));
     }

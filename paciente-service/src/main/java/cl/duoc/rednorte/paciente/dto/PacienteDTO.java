@@ -7,7 +7,6 @@ import java.time.LocalDate;
 @Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class PacienteDTO {
 
-    @NotBlank(message = "El RUT es obligatorio")
     private String rut;
 
     @NotBlank(message = "El nombre es obligatorio")
@@ -17,7 +16,6 @@ public class PacienteDTO {
     @NotBlank(message = "El apellido es obligatorio")
     private String apellido;
 
-    @NotNull(message = "La fecha de nacimiento es obligatoria")
     private LocalDate fechaNacimiento;
 
     @Email(message = "Formato de email inválido")
