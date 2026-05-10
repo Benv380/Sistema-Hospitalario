@@ -1,0 +1,27 @@
+# Maven / Java compilados
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.DS_Store
+*.DS_Store
+
+# Spring Boot logs
+*.log
+logs/
+
+# Variables de entorno / secretos
+.env
+*.env
+
+# Claude Code (herramienta de desarrollo — no es código del proyecto)
+.claude/
+INFORME_ARQUITECTURA.md
+memory/
+MEMORY.md
