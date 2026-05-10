@@ -42,4 +42,10 @@ public interface CitaMedicaRepository extends JpaRepository<CitaMedica, Long> {
            "AND c.estado IN ('PROGRAMADA','CONFIRMADA') AND c.fechaHoraCita >= :ahora " +
            "ORDER BY c.fechaHoraCita ASC")
     List<CitaMedica> findProximaCitaPaciente(Long pacienteId, LocalDateTime ahora);
+
+    // Todas las citas en un rango de fechas (agenda del día)
+    List<CitaMedica> findByFechaHoraCitaBetweenOrderByFechaHoraCitaAsc(LocalDateTime desde, LocalDateTime hasta);
+
+    // Citas de un médico en un rango de fechas (ya existe por nombre)
+    // findByNombreMedicoAndFechaHoraCitaBetween — declarado arriba
 }

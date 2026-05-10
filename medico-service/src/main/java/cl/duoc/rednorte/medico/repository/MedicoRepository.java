@@ -9,6 +9,7 @@ import java.util.Optional;
 @Repository
 public interface MedicoRepository extends JpaRepository<Medico, Long> {
     Optional<Medico> findByRut(String rut);
+    Optional<Medico> findByUsuarioId(Long usuarioId);
     List<Medico> findByEspecialidad(String especialidad);
     List<Medico> findByActivo(Boolean activo);
     Boolean existsByRut(String rut);

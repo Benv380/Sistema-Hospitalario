@@ -34,6 +34,10 @@ public class PacienteService {
             .orElseThrow(() -> new RuntimeException("Paciente no encontrado con RUT: " + rut));
     }
 
+    public List<Paciente> buscar(String q) {
+        return pacienteRepository.buscarPorEmailORut(q.trim());
+    }
+
     public Paciente crear(PacienteDTO dto) {
         if (pacienteRepository.existsByRut(dto.getRut())) {
             throw new RuntimeException("Ya existe paciente con RUT: " + dto.getRut());

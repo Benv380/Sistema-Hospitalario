@@ -23,6 +23,12 @@ public class PacienteController {
         return ResponseEntity.ok(pacienteService.listarTodos());
     }
 
+    @GetMapping("/buscar")
+    @PreAuthorize("hasAnyRole('FUNCIONARIO','MEDICO','ADMIN_HOSPITAL')")
+    public ResponseEntity<List<Paciente>> buscar(@RequestParam String q) {
+        return ResponseEntity.ok(pacienteService.buscar(q));
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('FUNCIONARIO','MEDICO','ADMIN_HOSPITAL','PACIENTE')")
     public ResponseEntity<Paciente> obtenerPorId(@PathVariable Long id) {
