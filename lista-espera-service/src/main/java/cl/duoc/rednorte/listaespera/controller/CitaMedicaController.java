@@ -49,6 +49,12 @@ public class CitaMedicaController {
         return ResponseEntity.ok(citaMedicaService.obtenerPorEstado(estado));
     }
 
+    // GET /api/v1/citas/paciente/{pacienteId}
+    @GetMapping("/paciente/{pacienteId}")
+    public ResponseEntity<List<CitaMedica>> obtenerPorPaciente(@PathVariable Long pacienteId) {
+        return ResponseEntity.ok(citaMedicaService.obtenerPorPaciente(pacienteId));
+    }
+
     // GET /api/v1/citas/reasignacion
     // Citas canceladas disponibles para reasignar a pacientes en espera
     @GetMapping("/reasignacion")

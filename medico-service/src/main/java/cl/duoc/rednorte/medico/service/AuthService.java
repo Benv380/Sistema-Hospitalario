@@ -3,8 +3,10 @@ package cl.duoc.rednorte.medico.service;
 import cl.duoc.rednorte.medico.config.JwtService;
 import cl.duoc.rednorte.medico.dto.AuthResponse;
 import cl.duoc.rednorte.medico.dto.CreateUsuarioRequest;
+import cl.duoc.rednorte.medico.model.Medico;
 import cl.duoc.rednorte.medico.model.RolUsuario;
 import cl.duoc.rednorte.medico.model.Usuario;
+import cl.duoc.rednorte.medico.repository.MedicoRepository;
 import cl.duoc.rednorte.medico.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final UsuarioRepository usuarioRepo;
+    private final MedicoRepository medicoRepo;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
@@ -49,6 +52,22 @@ public class AuthService {
             .build();
 
         Usuario guardado = usuarioRepo.save(nuevo);
+
+        if (rol == RolUsuario.MEDICO) {
+            String[] partes  = req.getNombreCompleto().trim().split("\\s+", 2);
+            String nombre    = partes[0];
+            String apellido  = partes.length > 1 ? partes[1] : "—";
+            medicoRepo.save(Medico.builder()
+                .usuarioId(guardado.getId())
+                .rut("M" + guardado.getId())   // placeholder hasta que admin complete el perfil
+                .nombre(nombre)
+                .apellido(apellido)
+                .especialidad("General")
+                .email(guardado.getEmail())
+                .activo(true)
+                .build());
+        }
+
         String token = jwtService.generateToken(guardado, rol.name());
         log.info("Usuario médico creado: {}", guardado.getEmail());
         return new AuthResponse(guardado.getId(), token, rol.name(), guardado.getNombreCompleto(), resolverRedirect(rol.name()));

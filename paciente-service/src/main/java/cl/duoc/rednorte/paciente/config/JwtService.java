@@ -41,8 +41,14 @@ public class JwtService {
         return extractEmail(token).equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         return Jwts.parser().verifyWith(getSigningKey()).build()
             .parseSignedClaims(token).getPayload().getExpiration().before(new Date());
+    }
+
+    public String extractRol(String token) {
+        Object rol = Jwts.parser().verifyWith(getSigningKey()).build()
+            .parseSignedClaims(token).getPayload().get("rol");
+        return rol != null ? rol.toString() : null;
     }
 }

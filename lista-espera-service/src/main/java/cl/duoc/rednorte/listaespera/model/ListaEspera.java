@@ -15,9 +15,8 @@ public class ListaEspera {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "paciente_id", nullable = false)
-    private Paciente paciente; // Relación con tabla pacientes (FK)
+    @Column(name = "paciente_id", nullable = false)
+    private Long pacienteId;
 
     @Column(nullable = false, length = 100)
     private String especialidad;

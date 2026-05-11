@@ -12,7 +12,10 @@ public class Medico {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 12, unique = true)
+    @Column(unique = true)
+    private Long usuarioId;
+
+    @Column(length = 12, unique = true)
     private String rut;
 
     @Column(nullable = false, length = 100)
