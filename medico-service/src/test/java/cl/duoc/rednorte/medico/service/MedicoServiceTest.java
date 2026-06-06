@@ -126,5 +126,44 @@ class MedicoServiceTest {
 
             verify(medicoRepository, never()).save(any());
         }
+
+        @Test
+        @DisplayName("Actualizar especialidad y datos del medico")
+        void actualizar_existente_actualizaDatos() {
+            MedicoDTO dtoActualizado = MedicoDTO.builder()
+                    .rut("9876543-2").nombre("Carlos Eduardo")
+                    .apellido("Garcia Soto").especialidad("Neurologia")
+                    .email("dr.garcia.soto@hospital.cl").telefono("56933333333")
+                    .build();
+
+            when(medicoRepository.findById(1L)).thenReturn(Optional.of(medico));
+            when(medicoRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+            Medico resultado = service.actualizar(1L, dtoActualizado);
+
+            assertThat(resultado.getEspecialidad()).isEqualTo("Neurologia");
+            assertThat(resultado.getNombre()).isEqualTo("Carlos Eduardo");
+        }
+
+        @Test
+        @DisplayName("Eliminar medico existente del sistema")
+        void eliminar_existente_llamaDeleteById() {
+            when(medicoRepository.findById(1L)).thenReturn(Optional.of(medico));
+
+            service.eliminar(1L);
+
+            verify(medicoRepository).deleteById(1L);
+        }
+    }
+
+    @Test
+    @DisplayName("Listar medicos por especialidad")
+    void listarPorEspecialidad_retornaMedicosEspecialidad() {
+        when(medicoRepository.findByEspecialidad("Cardiologia")).thenReturn(List.of(medico));
+
+        List<Medico> resultado = service.listarPorEspecialidad("Cardiologia");
+
+        assertThat(resultado).hasSize(1);
+        assertThat(resultado.get(0).getEspecialidad()).isEqualTo("Cardiologia");
     }
 }

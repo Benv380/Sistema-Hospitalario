@@ -146,6 +146,27 @@ class PacienteServiceTest {
     }
 
     @Test
+    @DisplayName("Buscar paciente por email o RUT")
+    void buscar_retornaPacientesCoincidentes() {
+        when(pacienteRepository.buscarPorEmailORut("12345678-9")).thenReturn(List.of(paciente));
+
+        List<Paciente> resultado = service.buscar("12345678-9");
+
+        assertThat(resultado).hasSize(1);
+        verify(pacienteRepository).buscarPorEmailORut("12345678-9");
+    }
+
+    @Test
+    @DisplayName("Obtener paciente por RUT existente")
+    void obtenerPorRut_existente_retornaPaciente() {
+        when(pacienteRepository.findByRut("12345678-9")).thenReturn(Optional.of(paciente));
+
+        Paciente resultado = service.obtenerPorRut("12345678-9");
+
+        assertThat(resultado.getRut()).isEqualTo("12345678-9");
+    }
+
+    @Test
     @DisplayName("Obtener paciente por usuario ID")
     void obtenerPorUsuarioId_existente_retornaPaciente() {
         paciente.setUsuarioId(50L);

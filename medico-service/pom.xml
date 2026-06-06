@@ -20,7 +20,7 @@
   <description>Microservicio de médicos - Red Norte</description>
 
   <properties>
-    <java.version>21</java.version>
+    <java.version>25</java.version>
     <jjwt.version>0.12.6</jjwt.version>
   </properties>
 
@@ -115,18 +115,17 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.12</version>
+        <version>0.8.13</version>
         <configuration>
           <excludes>
             <exclude>**/config/**</exclude>
-            <exclude>**/controller/**</exclude>
             <exclude>**/exception/**</exclude>
             <exclude>**/*Application.class</exclude>
             <exclude>**/service/AuthService.class</exclude>
             <exclude>**/service/UsuarioDetailsService.class</exclude>
             <exclude>**/dto/**</exclude>
-            <exclude>**/model/Usuario.class</exclude>
-            <exclude>**/model/RolUsuario.class</exclude>
+            <exclude>**/model/**</exclude>
+            <exclude>**/controller/AuthController.class</exclude>
           </excludes>
         </configuration>
         <executions>
@@ -137,6 +136,13 @@
             <goals><goal>report</goal></goals>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <argLine>${argLine} -Dnet.bytebuddy.experimental=true</argLine>
+        </configuration>
       </plugin>
     </plugins>
   </build>
