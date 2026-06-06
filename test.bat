@@ -4,7 +4,7 @@ echo ========================================
 echo  Ejecutando pruebas: lista-espera-service
 echo ========================================
 cd lista-espera-service
-call mvnw.cmd test
+call mvnw.cmd clean test
 start "" "%CD%\target\site\jacoco\index.html"
 cd ..
 
@@ -13,7 +13,7 @@ echo ========================================
 echo  Ejecutando pruebas: paciente-service
 echo ========================================
 cd paciente-service
-call mvnw.cmd test
+call mvnw.cmd clean test
 start "" "%CD%\target\site\jacoco\index.html"
 cd ..
 
@@ -22,7 +22,7 @@ echo ========================================
 echo  Ejecutando pruebas: medico-service
 echo ========================================
 cd medico-service
-call mvnw.cmd test
+call mvnw.cmd clean test
 start "" "%CD%\target\site\jacoco\index.html"
 cd ..
 
